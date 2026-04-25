@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# Data and Models (Usually kept local or in DVC)
+data/*.csv
+models/*.pkl
+
+# Streamlit
+.streamlit/
