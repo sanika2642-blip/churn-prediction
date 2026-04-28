@@ -1,174 +1,123 @@
 import streamlit as st
 
-st.set_page_config(
-    page_title="ChurnShield — Customer Churn Predictor",
-    page_icon="🛡️",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+st.set_page_config(page_title="Nexus AI", page_icon="⚡", layout="wide")
 
-# Custom CSS for professional look
+# --- THE "LIQUID DARK" CSS ---
 st.markdown("""
-<style>
-    .main-header {
-        font-size: 2.5rem; font-weight: 800;
-        background: linear-gradient(90deg, #1F4E79, #2196F3);
-        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        text-align: center; padding: 1rem 0;
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+
+    html, body, [data-testid="stAppViewContainer"] {
+        font-family: 'Inter', sans-serif;
+        background-color: #050505;
+        background-image: 
+            radial-gradient(at 0% 0%, rgba(99, 110, 250, 0.15) 0px, transparent 50%),
+            radial-gradient(at 100% 100%, rgba(239, 85, 59, 0.1) 0px, transparent 50%);
     }
-    .metric-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 1.5rem; border-radius: 12px; color: white;
-        text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+
+    .stApp { background: transparent; }
+
+    /* Glass Card Design */
+    .bento-card {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 24px;
+        padding: 40px;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        height: 320px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
     }
-    .risk-high   { background: #FF4444; color: white; padding: 1rem;
-                   border-radius: 10px; text-align: center; font-size: 1.3rem; font-weight: bold; }
-    .risk-low    { background: #00C851; color: white; padding: 1rem;
-                   border-radius: 10px; text-align: center; font-size: 1.3rem; font-weight: bold; }
-    .risk-medium { background: #FF8800; color: white; padding: 1rem;
-                   border-radius: 10px; text-align: center; font-size: 1.3rem; font-weight: bold; }
-</style>
-""", unsafe_allow_html=True)
 
-st.markdown('<p class="main-header">🛡️ ChurnShield — Customer Churn Predictor</p>',
-            unsafe_allow_html=True)
-st.markdown("##### Built by Sanika Jadhav | ML-powered churn risk analysis")
-st.divider()
+    .bento-card:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(99, 110, 250, 0.5);
+        transform: scale(1.02);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
 
-# Navigation
-page = st.sidebar.radio("Navigate", 
-    ["🏠 Home", "🔮 Predict Churn", "📊 EDA Dashboard", "📈 Model Insights"])
+    .icon-circle {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #636EFA, #AB63FA);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 20px rgba(99, 110, 250, 0.3);
+    }
 
-if page == "🏠 Home":
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.markdown('<div class="metric-card"><h2>7,043</h2><p>Customers Analyzed</p></div>',
-                    unsafe_allow_html=True)
-    with col2:
-        st.markdown('<div class="metric-card"><h2>26.5%</h2><p>Overall Churn Rate</p></div>',
-                    unsafe_allow_html=True)
-    with col3:
-        st.markdown('<div class="metric-card"><h2>~87%</h2><p>Model Accuracy</p></div>',
-                    unsafe_allow_html=True)
+    .hero-text {
+        font-weight: 800;
+        font-size: 4rem;
+        letter-spacing: -2px;
+        background: linear-gradient(to bottom, #fff 40%, #666 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0;
+    }
 
-    st.markdown("---")
-    st.markdown("### 📌 Key Findings from EDA")
+    /* Modern Buttons */
+    .stButton>button {
+        background: transparent !important;
+        border: 1px solid rgba(255,255,255,0.1) !important;
+        border-radius: 12px !important;
+        color: white !important;
+        padding: 10px 24px !important;
+        transition: 0.3s !important;
+    }
+
+    .stButton>button:hover {
+        border-color: #636EFA !important;
+        background: rgba(99, 110, 250, 0.1) !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+# --- HERO SECTION ---
+st.markdown('<h1 class="hero-text">Nexus.ai</h1>', unsafe_allow_html=True)
+st.markdown("<p style='color: #888; font-size: 1.5rem; margin-top: -10px;'>Predicting churn before it happens.</p>", unsafe_allow_html=True)
+
+st.write("##")
+st.write("##")
+
+# --- BENTO NAVIGATION ---
+col1, col2, col3 = st.columns(3, gap="large")
+
+with col1:
     st.markdown("""
-    - 📄 **Month-to-month contracts** have 3x higher churn than 2-year contracts
-    - 💳 **Electronic check** payment users churn at nearly 2x the rate of auto-pay users
-    - 👴 **Senior citizens** churn at 41% vs 24% for non-seniors
-    - 🌐 **Fiber optic** internet users churn more despite faster speeds — pricing may be the trigger
-    - 💰 High **monthly charges** (>$65) strongly correlate with churn intent
-    """)
+        <div class="bento-card">
+            <div class="icon-circle">📈</div>
+            <h2>Insights</h2>
+            <p style='color: #777;'>Deep-dive into customer behavior patterns and revenue leakage.</p>
+        </div>
+    """, unsafe_allow_html=True)
+    if st.button("Open Dashboard", use_container_width=True):
+        st.switch_page("pages/eda_dashboard.py")
 
-elif page == "🔮 Predict Churn":
-    import joblib, numpy as np, pandas as pd
-
-    st.markdown("### Enter Customer Details")
-
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        st.markdown("**📋 Demographics**")
-        gender         = st.selectbox("Gender", ["Male", "Female"])
-        senior         = st.selectbox("Senior Citizen", ["No", "Yes"])
-        partner        = st.selectbox("Has Partner", ["Yes", "No"])
-        dependents     = st.selectbox("Has Dependents", ["Yes", "No"])
-        tenure         = st.slider("Tenure (months)", 0, 72, 12)
-
-    with col2:
-        st.markdown("**📱 Services**")
-        phone_service  = st.selectbox("Phone Service", ["Yes", "No"])
-        multiple_lines = st.selectbox("Multiple Lines", ["No", "Yes", "No phone service"])
-        internet       = st.selectbox("Internet Service", ["Fiber optic", "DSL", "No"])
-        online_sec     = st.selectbox("Online Security", ["Yes", "No", "No internet service"])
-        online_backup  = st.selectbox("Online Backup", ["Yes", "No", "No internet service"])
-
-    with col3:
-        st.markdown("**💰 Billing**")
-        contract       = st.selectbox("Contract Type", ["Month-to-month", "One year", "Two year"])
-        paperless      = st.selectbox("Paperless Billing", ["Yes", "No"])
-        payment        = st.selectbox("Payment Method",
-                            ["Electronic check", "Mailed check",
-                             "Bank transfer (automatic)", "Credit card (automatic)"])
-        monthly_charges = st.number_input("Monthly Charges ($)", 18.0, 120.0, 65.0, step=0.5)
-        total_charges   = st.number_input("Total Charges ($)", 0.0, 9000.0,
-                                           monthly_charges * tenure, step=10.0)
-
-    if st.button("🔮 Predict Churn Risk", use_container_width=True, type="primary"):
-        try:
-            model        = joblib.load('../models/best_model.pkl')
-            scaler       = joblib.load('../models/scaler.pkl')
-            feature_cols = joblib.load('../models/feature_columns.pkl')
-
-            # Build input dict
-            raw = {
-                'gender': 1 if gender == "Male" else 0,
-                'SeniorCitizen': 1 if senior == "Yes" else 0,
-                'Partner': 1 if partner == "Yes" else 0,
-                'Dependents': 1 if dependents == "Yes" else 0,
-                'tenure': tenure,
-                'PhoneService': 1 if phone_service == "Yes" else 0,
-                'PaperlessBilling': 1 if paperless == "Yes" else 0,
-                'MonthlyCharges': monthly_charges,
-                'TotalCharges': total_charges,
-            }
-
-            input_df = pd.DataFrame([raw])
-            # One-hot encode to match training columns
-            input_df = input_df.reindex(columns=feature_cols, fill_value=0)
-            input_scaled = scaler.transform(input_df)
-            prob = model.predict_proba(input_scaled)[0][1]
-
-            st.divider()
-            col_a, col_b = st.columns(2)
-            with col_a:
-                risk_pct = f"{prob*100:.1f}%"
-                if prob > 0.7:
-                    st.markdown(f'<div class="risk-high">🔴 HIGH RISK — {risk_pct}</div>',
-                                unsafe_allow_html=True)
-                    st.error("**Action:** Offer retention discount or upgrade immediately.")
-                elif prob > 0.4:
-                    st.markdown(f'<div class="risk-medium">🟡 MEDIUM RISK — {risk_pct}</div>',
-                                unsafe_allow_html=True)
-                    st.warning("**Action:** Send satisfaction survey and loyalty offer.")
-                else:
-                    st.markdown(f'<div class="risk-low">🟢 LOW RISK — {risk_pct}</div>',
-                                unsafe_allow_html=True)
-                    st.success("**Action:** Maintain current service experience.")
-
-            with col_b:
-                import plotly.graph_objects as go
-                fig = go.Figure(go.Indicator(
-                    mode="gauge+number",
-                    value=prob * 100,
-                    domain={'x': [0, 1], 'y': [0, 1]},
-                    title={'text': "Churn Probability (%)"},
-                    gauge={
-                        'axis': {'range': [0, 100]},
-                        'bar': {'color': "darkblue"},
-                        'steps': [
-                            {'range': [0, 40], 'color': "#00C851"},
-                            {'range': [40, 70], 'color': "#FF8800"},
-                            {'range': [70, 100], 'color': "#FF4444"}
-                        ]
-                    }
-                ))
-                fig.update_layout(height=300)
-                st.plotly_chart(fig, use_container_width=True)
-
-        except FileNotFoundError:
-            st.error("⚠️ Model not found. Run src/train.py first to generate the model files.")
-
-elif page == "📊 EDA Dashboard":
-    st.markdown("### Exploratory Data Analysis")
-    st.image("static/churn_by_features.png", caption="Churn Rate by Key Features", use_column_width=True)
-    st.image("static/correlation_heatmap.png", caption="Feature Correlation Heatmap", use_column_width=True)
-
-elif page == "📈 Model Insights":
-    st.markdown("### Model Performance Comparison")
-    st.image("static/roc_curves.png", caption="ROC Curves — All Models", use_column_width=True)
+with col2:
     st.markdown("""
-    **How to read this:** The closer the curve hugs the top-left corner, the better the model.
-    AUC of 1.0 = perfect. AUC of 0.5 = random guessing. Our best model scores ~0.87.
-    """)
+        <div class="bento-card">
+            <div class="icon-circle">🧠</div>
+            <h2>Engine</h2>
+            <p style='color: #777;'>Explainable AI metrics, feature weights, and performance audits.</p>
+        </div>
+    """, unsafe_allow_html=True)
+    if st.button("Audit Model", use_container_width=True):
+        st.switch_page("pages/model_insights.py")
+
+with col3:
+    st.markdown("""
+        <div class="bento-card">
+            <div class="icon-circle">🎯</div>
+            <h2>Predict</h2>
+            <p style='color: #777;'>Real-time churn risk profiling and customer segmentation.</p>
+        </div>
+    """, unsafe_allow_html=True)
+    if st.button("Run Inference", use_container_width=True):
+        st.switch_page("pages/predict.py")
