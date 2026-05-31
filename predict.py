@@ -1,63 +1,51 @@
 import pickle
+import sys
 import pandas as pd
 from pathlib import Path
-from .preprocess import preprocess_data
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-MODEL_PATH = BASE_DIR / "models" / "churn_model.pkl"
+BASE_DIR = Path(__file__).resolve().parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
 
-# Load artifact once globally for performance
-artifact = None
-if MODEL_PATH.exists():
-    with open(MODEL_PATH, "rb") as f:
-        artifact = pickle.load(f)
+from preprocess import preprocess_data
 
-def predict_churn(user_input_dict):
-    """
-    Takes user input, maps to required features, and returns prediction.
-    """
-    if artifact is None:
-        raise FileNotFoundError("Model artifact not found. Run train.py first.")
+MODEL_PATH = BASE_DIR / "best_model.pkl"
 
+_artifact = None
+
+def _load():
+    global _artifact
+    if _artifact is None:
+        if not MODEL_PATH.exists():
+            raise FileNotFoundError(f"Model not found at {MODEL_PATH}")
+        with open(MODEL_PATH, "rb") as f:
+            _artifact = pickle.load(f)
+    return _artifact
+
+
+def predict_churn(user_input: dict) -> dict:
+    artifact = _load()
     model = artifact["model"]
     expected_features = artifact["features"]
 
-    # Provide reasonable defaults for features not exposed in the simple UI
-    default_data = {
-        'gender': 'Male', 'SeniorCitizen': 0, 'Partner': 'No', 'Dependents': 'No',
-        'PhoneService': 'Yes', 'MultipleLines': 'No', 'OnlineSecurity': 'No',
-        'OnlineBackup': 'No', 'DeviceProtection': 'No', 'TechSupport': 'No',
-        'StreamingTV': 'No', 'StreamingMovies': 'No', 'PaperlessBilling': 'Yes',
-        'PaymentMethod': 'Electronic check', 
-        'TotalCharges': user_input_dict.get('MonthlyCharges', 0) * user_input_dict.get('tenure', 0)
+    defaults = {
+        'gender': 'Male', 'SeniorCitizen': 0, 'Partner': 'No',
+        'Dependents': 'No', 'PhoneService': 'Yes', 'MultipleLines': 'No',
+        'OnlineSecurity': 'No', 'OnlineBackup': 'No', 'DeviceProtection': 'No',
+        'TechSupport': 'No', 'StreamingTV': 'No', 'StreamingMovies': 'No',
+        'PaperlessBilling': 'Yes', 'PaymentMethod': 'Electronic check',
     }
-    
-    # Overwrite defaults with actual user input
-    default_data.update(user_input_dict)
+    defaults['TotalCharges'] = (
+        user_input.get('MonthlyCharges', 65) * user_input.get('tenure', 12)
+    )
+    defaults.update(user_input)
 
-    # Convert to DataFrame
-    df = pd.DataFrame([default_data])
+    df = pd.DataFrame([defaults])
+    X = preprocess_data(df, is_training=False)
+    X = X.reindex(columns=expected_features, fill_value=0)
 
-    # Preprocess (creates OHE features)
-    X_processed = preprocess_data(df, is_training=False)
+    prob = float(model.predict_proba(X)[0][1])
+    label = "Yes" if prob >= 0.5 else "No"
+    risk = "High" if prob > 0.70 else ("Medium" if prob >= 0.40 else "Low")
 
-    # Align columns to match what the model was trained on
-    X_aligned = X_processed.reindex(columns=expected_features, fill_value=0)
-
-    # Predict
-    probability = model.predict_proba(X_aligned)[0][1]
-    label = "Yes" if probability >= 0.5 else "No"
-    
-    # Risk Segmentation
-    if probability > 0.7:
-        risk_level = "High"
-    elif probability >= 0.4:
-        risk_level = "Medium"
-    else:
-        risk_level = "Low"
-
-    return {
-        "probability": probability,
-        "label": label,
-        "risk_level": risk_level
-    }
+    return {"probability": round(prob, 4), "label": label, "risk_level": risk}
