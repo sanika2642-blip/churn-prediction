@@ -14,6 +14,11 @@ A production-quality machine learning application to predict and analyze custome
 * `/models`: Serialized machine learning models and artifacts.
 * `/src`: Core logic (preprocessing, training, inference).
 
+##  Dashboard Preview
+
+<img width="1600" height="783" alt="image" src="https://github.com/user-attachments/assets/2547718e-c552-41a2-b71b-cf5eb972dd6c" />
+
+
 ## How to Run
 1.  **Install dependencies:**
     ```bash
